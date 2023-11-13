@@ -29,7 +29,7 @@ steps:
     git config --global user.email "github@gregs.io"
     git add -A
     git commit -m "[Cloud Builder] Updated image tag us-docker.pkg.dev/$PROJECT_ID/${_ARTIFACT_REPO}/evmosdtestnet:$SHORT_SHA"
-    git push https://$$GIT_ACCESS_TOKEN@github.com/gregsio/evmos-gcp.git ${_CD_BRANCH}
+    git push https://gregsio:$$GIT_ACCESS_TOKEN@github.com/gregsio/evmos-gcp.git ${_CD_BRANCH}
 
 availableSecrets:
   secretManager:
