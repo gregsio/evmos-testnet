@@ -23,7 +23,7 @@ steps:
     echo "Updating image tag version ..."
     cd  evmos-gcp/evmos/manifests
     sed "s/GOOGLE_CLOUD_PROJECT/$PROJECT_ID/g" statefulset.yaml.tpl | \
-    sed "s/COMMIT_SHA/${SHORT_SHA}/g" > deployment.yaml
+    sed "s/COMMIT_SHA/${SHORT_SHA}/g" > statefulset.yaml
     echo "Pushing changes to k8s manifest repo ..."
     git config --global user.name "gregs"
     git config --global user.email "github@gregs.io"
