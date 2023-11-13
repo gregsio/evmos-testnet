@@ -1,0 +1,40 @@
+#### Building Docker Image ####
+steps:
+- name: 'gcr.io/cloud-builders/docker'
+  args: [ 'build', '-t', 'us-docker.pkg.dev/$PROJECT_ID/${_ARTIFACT_REPO}/evmosdtestnet:$SHORT_SHA', '-t', 'us-docker.pkg.dev/$PROJECT_ID/${_ARTIFACT_REPO}/evmosdtestnet:${_IMAGE_TAG}', '.' ]
+
+#### Pushing Docker Image ####
+- name: 'gcr.io/cloud-builders/docker'
+  entrypoint: /bin/sh
+  args:
+  - -c
+  - |
+    docker push us-docker.pkg.dev/$PROJECT_ID/${_ARTIFACT_REPO}/evmosdtestnet:$SHORT_SHA
+    docker push us-docker.pkg.dev/$PROJECT_ID/${_ARTIFACT_REPO}/evmosdtestnet:${_IMAGE_TAG}
+
+# This step generates the new manifest
+- name: 'gcr.io/cloud-builders/gcloud'
+  entrypoint: /bin/sh
+  secretEnv: ['GIT_ACCESS_TOKEN']
+  args:
+  - '-c'
+  - |
+    git clone https://gregsio:$$GIT_ACCESS_TOKEN@github.com/gregsio/evmos-gcp.git -b ${_CD_BRANCH}
+    echo "Updating image tag version ..."
+    cd  evmos-gcp/k8s/maniests
+    sed "s/GOOGLE_CLOUD_PROJECT/$PROJECT_ID/g" statefulset.yaml.tpl | \
+    sed "s/COMMIT_SHA/${SHORT_SHA}/g" > deployment.yaml
+    echo "Pushing changes to k8s manifest repo ..."
+    git config --global user.name "gregs"
+    git config --global user.email "github@gregs.io"
+    git add -A
+    git commit -m "[Cloud Builder] Updated image tag us-docker.pkg.dev/$PROJECT_ID/${_ARTIFACT_REPO}/evmosdtestnet:$SHORT_SHA"
+    git push https://gregsio:$$GIT_ACCESS_TOKEN@github.com/<your-github-id>/evmos-gcp.git ${_CD_BRANCH}
+
+availableSecrets:
+  secretManager:
+  - versionName: projects/$PROJECT_NUMBER/secrets/github-access-token/versions/latest
+    env: 'GIT_ACCESS_TOKEN'
+
+# options:
+#   logging: CLOUD_LOGGING_ONLY
