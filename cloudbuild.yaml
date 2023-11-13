@@ -19,7 +19,7 @@ steps:
   args:
   - '-c'
   - |
-    git clone https://gregsio:$$GIT_ACCESS_TOKEN@github.com/gregsio/evmos-gcp.git -b ${_CD_BRANCH}
+    git clone https://github.com/gregsio/evmos-gcp.git -b ${_CD_BRANCH}
     echo "Updating image tag version ..."
     cd  evmos-gcp/evmos/manifests
     sed "s/GOOGLE_CLOUD_PROJECT/$PROJECT_ID/g" statefulset.yaml.tpl | \
@@ -29,7 +29,7 @@ steps:
     git config --global user.email "github@gregs.io"
     git add -A
     git commit -m "[Cloud Builder] Updated image tag us-docker.pkg.dev/$PROJECT_ID/${_ARTIFACT_REPO}/evmosdtestnet:$SHORT_SHA"
-    git push https://github.com/gregsio/evmos-gcp.git ${_CD_BRANCH}
+    git push https://$$GIT_ACCESS_TOKEN@github.com/gregsio/evmos-gcp.git ${_CD_BRANCH}
 
 availableSecrets:
   secretManager:
